@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
 import {Button,Segment,Message,Header,Label} from 'semantic-ui-react';
+import openSocket from 'socket.io-client';
+const serverScoket=openSocket('http://localhost:3000');
 const colors=[
     'red', 'orange', 'yellow', 'olive', 'green', 'teal',
     'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black'
@@ -31,6 +33,14 @@ class SocialBoard extends Component{
     componentDidMount(){
         this.setState({
             myCanvas:this.refs.board.getContext("2d")});
+            serverScoket.on('draw_lines',(data)=>{
+            this.state.myCanvas.beginPath(); 
+            this.state.myCanvas.moveTo(data.line[0], data.line[1]);
+            this.state.myCanvas.lineTo(data.line[0], data.line[1]);
+            this.state.myCanvas.closePath();
+            this.state.myCanvas.strokeStyle=data.color;            
+            this.state.myCanvas.stroke();
+        });
     }
     _handleColorSelect(index){
         this.setState({
@@ -41,12 +51,28 @@ class SocialBoard extends Component{
         this.setState({
             paint:true
         })
-        this.addClickEvent(event.pageX-this.refs.board.offsetLeft,event.pageY-this.refs.board.offsetTop);
+        var drawX=event.pageX-this.refs.board.offsetLeft;
+        var drawY=event.pageY-this.refs.board.offsetTop;
+        this.addClickEvent(drawX,drawY);
+        serverScoket.emit('draw_lines',{
+            line:[
+                drawX,drawY
+            ],
+            color:this.state.brushColor
+        })
         this.redrawBoard();
     }
     _handleMouseMove(event){
         if(this.state.paint){
-            this.addClickEvent(event.pageX-this.refs.board.offsetLeft,event.pageY-this.refs.board.offsetTop,true);
+            var drawX=event.pageX-this.refs.board.offsetLeft;
+            var drawY=event.pageY-this.refs.board.offsetTop;
+            this.addClickEvent(drawX,drawY,true);
+            serverScoket.emit('draw_lines',{
+                line:[
+                    drawX,drawY
+                ],
+                color:this.state.brushColor
+            })
             this.redrawBoard();
         }
     }
@@ -79,7 +105,6 @@ class SocialBoard extends Component{
         });
     }
     render(){
-        const {brushColor}=this.state;
         return(
             <div>
                 <Message

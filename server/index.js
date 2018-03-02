@@ -32,13 +32,20 @@ app.get('/',function(req, res, next){
     res.send(`<!doctype html>${html}`);
 });
 var prev_lines=[];
+var color=[];
 io.on('connection',(socket)=>{
     for(var i in prev_lines){
-        socket.emit('draw_lines',{line:prev_lines[i]})
+        socket.emit('draw_lines',{
+            line:prev_lines[i],
+            color:color[i]})
     }
     socket.on('draw_lines',(data)=>{
         prev_lines.push(data.line);
-        io.emit('draw_line',{line:data.line})
+        color.push(data.color);
+        //BroadCasting New Coordinates
+        io.emit('draw_lines',{
+            line:data.line,
+            color:data.color})
     });
 });
 server.listen(port, ()=>{
