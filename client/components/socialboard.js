@@ -41,7 +41,7 @@ class SocialBoard extends Component{
         this.setState({
             paint:true
         })
-        this.addClickEvent(event.pageX,event.pageY);
+        this.addClickEvent(event.pageX-this.refs.board.offsetLeft,event.pageY-this.refs.board.offsetTop);
         this.redrawBoard();
     }
     _handleMouseMove(event){
@@ -84,6 +84,7 @@ class SocialBoard extends Component{
             <div>
                 <Message
       attached
+      color={this.state.brushColor}
       header='Welcome to Social Board!'
       content='Start Drawing whatever you want'
     >
@@ -104,7 +105,7 @@ class SocialBoard extends Component{
         {
             colors.map((item,index)=>{
                 {
-                    return <Label style={{cursor:'pointer'}} circular onClick={(e)=>this._handleColorSelect(index)} color={item} key={index}>{index}</Label>
+                    return <Label style={{cursor:'pointer'}} circular onClick={(e)=>this._handleColorSelect(index)} color={item} key={index}></Label>
                 }
             })
         }

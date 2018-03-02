@@ -7,12 +7,14 @@ import ReactDOMServer from 'react-dom/server'
 import App from '../client/components/App'
 import Html from './Html'
 import WDM from './WDM'
-
+import http from 'http';
+import socket from 'socket.io';
 const app = express();
 const port = 3000;
 
 app.use(WDM);
-
+var server=http.createServer(app);
+var io=socket.listen(server);
 app.get('/',function(req, res, next){
 
     let preloadState = {
@@ -29,7 +31,16 @@ app.get('/',function(req, res, next){
 
     res.send(`<!doctype html>${html}`);
 });
-
-app.listen(port, ()=>{
+var prev_lines=[];
+io.on('connection',(socket)=>{
+    for(var i in prev_lines){
+        socket.emit('draw_lines',{line:prev_lines[i]})
+    }
+    socket.on('draw_lines',(data)=>{
+        prev_lines.push(data.line);
+        io.emit('draw_line',{line:data.line})
+    });
+});
+server.listen(port, ()=>{
     console.log('http://localhost:3000')
 });
