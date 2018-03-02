@@ -31,20 +31,24 @@ app.get('/',function(req, res, next){
 
     res.send(`<!doctype html>${html}`);
 });
-var prev_lines=[];
+var current_lines=[];
 var color=[];
+var prev_line=[];
 io.on('connection',(socket)=>{
-    for(var i in prev_lines){
+    for(var i in current_lines){
         socket.emit('draw_lines',{
-            line:prev_lines[i],
+            line:current_lines[i],
+            previousLine:prev_line[i],
             color:color[i]})
     }
     socket.on('draw_lines',(data)=>{
-        prev_lines.push(data.line);
+        current_lines.push(data.line);
         color.push(data.color);
+        prev_line.push(data.previousLine)
         //BroadCasting New Coordinates
         io.emit('draw_lines',{
             line:data.line,
+            previousLine:data.previousLine,
             color:data.color})
     });
 });

@@ -10,8 +10,8 @@ class SocialBoard extends Component{
     constructor(props){
         super(props);
         this.state={
-            clkX:[],
-            clkY:[],
+            currentLine:[],
+            previousLine:[],
             clkDrag:[],
             paint:false,
             clkColor:[],
@@ -25,8 +25,9 @@ class SocialBoard extends Component{
         this._handleColorSelect=this._handleColorSelect.bind(this);
     }
     addClickEvent(x,y,drag){
-        this.state.clkX.push(x);
-        this.state.clkY.push(y);
+        this.state.currentLine.push({
+            x:x,y:y});
+        //this.state.clkY.push(y);
         this.state.clkDrag.push(drag)
         this.state.clkColor.push(this.state.brushColor)
     }
@@ -34,12 +35,12 @@ class SocialBoard extends Component{
         this.setState({
             myCanvas:this.refs.board.getContext("2d")});
             serverScoket.on('draw_lines',(data)=>{
-            this.state.myCanvas.beginPath(); 
-            this.state.myCanvas.moveTo(data.line[0], data.line[1]);
-            this.state.myCanvas.lineTo(data.line[0], data.line[1]);
-            this.state.myCanvas.closePath();
-            this.state.myCanvas.strokeStyle=data.color;            
-            this.state.myCanvas.stroke();
+                this.state.myCanvas.beginPath(); 
+                this.state.myCanvas.moveTo(data.previousLine[0],data.previousLine[1]);
+                this.state.myCanvas.lineTo(data.line[0], data.line[1]);
+                this.state.myCanvas.closePath();
+                this.state.myCanvas.strokeStyle=data.color;            
+                this.state.myCanvas.stroke();
         });
     }
     _handleColorSelect(index){
@@ -54,12 +55,6 @@ class SocialBoard extends Component{
         var drawX=event.pageX-this.refs.board.offsetLeft;
         var drawY=event.pageY-this.refs.board.offsetTop;
         this.addClickEvent(drawX,drawY);
-        serverScoket.emit('draw_lines',{
-            line:[
-                drawX,drawY
-            ],
-            color:this.state.brushColor
-        })
         this.redrawBoard();
     }
     _handleMouseMove(event){
@@ -67,13 +62,11 @@ class SocialBoard extends Component{
             var drawX=event.pageX-this.refs.board.offsetLeft;
             var drawY=event.pageY-this.refs.board.offsetTop;
             this.addClickEvent(drawX,drawY,true);
-            serverScoket.emit('draw_lines',{
-                line:[
-                    drawX,drawY
-                ],
-                color:this.state.brushColor
-            })
             this.redrawBoard();
+            this.state.previousLine.push({
+                x:drawX,
+                y:drawY
+            })
         }
     }
     _handleMouseUp(event){
@@ -87,18 +80,36 @@ class SocialBoard extends Component{
         })
     }
     redrawBoard(){
-        this.state.myCanvas.clearRect(0,0,this.state.myCanvas.canvas.width,this.state.myCanvas.canvas.height);
+        //this.state.myCanvas.clearRect(0,0,this.state.myCanvas.canvas.width,this.state.myCanvas.canvas.height);
         this.state.myCanvas.lineJoin="round";
         this.state.myCanvas.lineWidth=5;
-        this.state.clkX.map((item,index)=>{
+        this.state.currentLine.map((item,index)=>{
             this.state.myCanvas.beginPath();
             if(this.state.clkDrag[index]&&index){
-                this.state.myCanvas.moveTo(this.state.clkX[index-1],this.state.clkY[index-1]);
+                this.state.myCanvas.moveTo(this.state.currentLine[index-1].x,this.state.currentLine[index-1].y);
+                serverScoket.emit('draw_lines',{
+                    line:[
+                        this.state.currentLine[index].x,this.state.currentLine[index].y
+                    ],
+                    previousLine:[
+                        this.state.currentLine[index-1].x,this.state.currentLine[index-1].y
+                    ],
+                    color:this.state.brushColor,
+                })
             }else{
-                this.state.myCanvas.moveTo(this.state.clkX[index]-1,this.state.clkY[index]);
+                this.state.myCanvas.moveTo(this.state.currentLine[index].x-1,this.state.currentLine[index].y);
+                serverScoket.emit('draw_lines',{
+                    line:[
+                        this.state.currentLine[index].x,this.state.currentLine[index].y
+                    ],
+                    previousLine:[
+                        this.state.currentLine[index].x-1,this.state.currentLine[index].y
+                    ],
+                    color:this.state.brushColor,
+                })
             }
             
-            this.state.myCanvas.lineTo(this.state.clkX[index],this.state.clkY[index]);
+            this.state.myCanvas.lineTo(this.state.currentLine[index].x,this.state.currentLine[index].y);
             this.state.myCanvas.closePath();
             this.state.myCanvas.strokeStyle=this.state.clkColor[index];            
             this.state.myCanvas.stroke();
