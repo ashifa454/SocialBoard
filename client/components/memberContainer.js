@@ -3,33 +3,45 @@ import {List,Image,Message,Form,Input,Icon,Segment,Feed} from 'semantic-ui-react
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {ActionCreater} from '../app/actions';
+import {dbRefMessage} from '../App/lib/firebaseApi';
 class MemberContainer extends Component{
     constructor(props){
         super(props);
         this.state={
-            usernam:null,
+            username:null,
             isRegistered:false,
-            message:[1,2,3,4,5,6,7,8]
+            message:[],
+            msgInput:null
         }
         this._handleFormSubmit=this._handleFormSubmit.bind(this);
         this._handleInput=this._handleInput.bind(this);
+        this._handleMessaeSubmit=this._handleMessaeSubmit.bind(this);
     }
     _handleFormSubmit(e){
         this.props.setMember(this.state.username);
-        /*this.setState({
-            isRegistered:true
-        })*/       
     }
     _handleInput(e,{name,value}){
         this.setState({[name]:value});
     }
+    _handleMessaeSubmit(e){
+        if(this.state.msgInput.length>1){
+            this.props.sendMessage({
+                name:this.state.username,
+                message:this.state.msgInput
+            })        
+        }
+    }
     componentDidMount(){
-
+        dbRefMessage.on('value',(snapshop)=>{
+            this.setState({
+                message:snapshop.val()
+            });
+        })
     }
     render(){
         return (
             <div>
-        {(this.props.members)?        <Message
+        {(this.props.members&&this.props.members.length>0)?<Message
             attached
             header={this.props.members}
             content='Chat Here with People on Socio Board'
@@ -39,10 +51,7 @@ class MemberContainer extends Component{
             content='Add your Name to Get Started'
         />
 }
-            {(this.props.members&&this.props.members.length>0)?<Form onSubmit={this._handleFormSubmit}>
-                <Form.Input label='What`s Your Good Name' name="username" onChange={this._handleInput}/>
-                <Form.Button type={'success'}>Get Started</Form.Button>
-              </Form>:<div>
+            {(this.props.members&&this.props.members.length>0)?<div>
                   <Segment attached basic style={{backgroundColor:'#FFFFFF',minHeight:'500px',maxHeight:'500px',overflowY:'scroll'}}>
                   
                   <Feed size='small'>
@@ -67,9 +76,14 @@ class MemberContainer extends Component{
               </Segment>
               <Input
               fluid
-    icon={<Icon name='send' inverted circular link />}
+    icon={<Icon name='send' inverted circular link onClick={this._handleMessaeSubmit}/>}
     placeholder='Type Your Message'
-  /></div>
+    name='msgInput'
+    onChange={this._handleInput}
+  /></div>:<Form onSubmit={this._handleFormSubmit}>
+                <Form.Input label='What`s Your Good Name' name="username" onChange={this._handleInput}/>
+                <Form.Button type={'success'}>Get Started</Form.Button>
+              </Form>
                 }
           </div>
         ) 

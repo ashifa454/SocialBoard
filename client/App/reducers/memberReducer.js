@@ -5,3 +5,8 @@ export const NewMember=createReducer({},{
         return action.member
     }
 })
+export const messages=createReducer({},{
+    [types.SET_MESSAGE](state,action){
+        return action.message
+    }
+})
