@@ -1,0 +1,26 @@
+{
+  "name": "social_board",
+  "version": "1.0.0",
+  "main": "server/inex.js",
+  "dependencies": {
+    "express": "^4.15.2",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "semantic-ui-css": "^2.3.0",
+    "semantic-ui-react": "^0.78.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.10",
+    "webpack": "^3.0.0",
+    "webpack-dev-middleware": "^1.11.0"
+  },
+  "scripts": {
+    "dev": "nodemon --exec babel-node server",
+    "build": "webpack"
+  }
+}
