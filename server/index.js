@@ -4,7 +4,10 @@ import express from 'express'
 // React
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
+import { createStore } from 'redux'
 import App from '../client/components/App'
+import reducer from '../client/App/reducers/index';
+import { Provider } from 'react-redux'
 import Html from './Html'
 import WDM from './WDM'
 import http from 'http';
@@ -20,11 +23,11 @@ app.get('/',function(req, res, next){
     let preloadState = {
         text : 'Hello React-SSR ! Server Side Rendering'
     };
-
+    const store=createStore(reducer)
     let renderProps = {
         preloadState: `window.__PRELOADED_STATE__ =${JSON.stringify(preloadState).replace(/</g, '\\u003c')}`,
         script: 'http://localhost:3000/build/client.bundle.js',
-        appComponent: ReactDOMServer.renderToString(<App data={preloadState}/>)
+        appComponent: ReactDOMServer.renderToString(<Provider store={store}><App data={preloadState}/></Provider>)
     };
 
     const html = ReactDOMServer.renderToStaticMarkup(<Html {...renderProps}/>); // server-side Rendering
