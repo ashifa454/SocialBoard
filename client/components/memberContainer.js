@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {List,Image,Message,Form,Input,Icon,Segment,Feed} from 'semantic-ui-react';
+import {List,Image,Message,Form,Input,Loader,Icon,Segment,Feed} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {ActionCreater} from '../app/actions';
@@ -16,6 +16,13 @@ class MemberContainer extends Component{
         this._handleFormSubmit=this._handleFormSubmit.bind(this);
         this._handleInput=this._handleInput.bind(this);
         this._handleMessaeSubmit=this._handleMessaeSubmit.bind(this);
+        dbRefMessage.on('value',(snapshot)=>{
+            this.setState({
+                message:Object.values(snapshot.val())
+            },()=>{
+                console.log(this.state.message);
+            });
+        })
     }
     _handleFormSubmit(e){
         this.props.setMember(this.state.username);
@@ -32,9 +39,9 @@ class MemberContainer extends Component{
         }
     }
     componentDidMount(){
-        dbRefMessage.on('value',(snapshop)=>{
+        dbRefMessage.on('value',(snapshot)=>{
             this.setState({
-                message:snapshop.val()
+                message:snapshot.val()
             });
         })
     }
@@ -55,7 +62,7 @@ class MemberContainer extends Component{
                   <Segment attached basic style={{backgroundColor:'#FFFFFF',minHeight:'500px',maxHeight:'500px',overflowY:'scroll'}}>
                   
                   <Feed size='small'>
-                      {
+                      {   (this.state.message.length>1)?
                           this.state.message.map((item)=>{
                               return <Feed.Event>
       <Feed.Label icon='smile' />
@@ -70,7 +77,7 @@ class MemberContainer extends Component{
       </Feed.Content>
     </Feed.Event>
     
-                          })
+                          }):<Loader active inline='centered'/>
                       }
                 </Feed>
               </Segment>
