@@ -4,6 +4,7 @@
   "main": "server/inex.js",
   "dependencies": {
     "express": "^4.15.2",
+    "firebase": "^4.10.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "semantic-ui-css": "^2.3.0",

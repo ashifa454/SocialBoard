@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {Button,Segment,Message,Header,Label} from 'semantic-ui-react';
+import {Button,Segment,Message,Header,Label,TransitionablePortal} from 'semantic-ui-react';
 import openSocket from 'socket.io-client';
 const serverScoket=openSocket('http://localhost:3000');
 const colors=[
@@ -33,7 +33,10 @@ class SocialBoard extends Component{
     }
     componentDidMount(){
         this.setState({
-            myCanvas:this.refs.board.getContext("2d")});
+            myCanvas:this.refs.board.getContext("2d")},()=>{
+                this.state.myCanvas.lineJoin="round";
+                this.state.myCanvas.lineWidth=5;
+            });
             serverScoket.on('draw_lines',(data)=>{
                 this.state.myCanvas.beginPath(); 
                 this.state.myCanvas.moveTo(data.previousLine[0],data.previousLine[1]);
@@ -80,11 +83,9 @@ class SocialBoard extends Component{
         })
     }
     redrawBoard(){
-        //this.state.myCanvas.clearRect(0,0,this.state.myCanvas.canvas.width,this.state.myCanvas.canvas.height);
-        this.state.myCanvas.lineJoin="round";
-        this.state.myCanvas.lineWidth=5;
         this.state.currentLine.map((item,index)=>{
             this.state.myCanvas.beginPath();
+            this.state.myCanvas.strokeStyle=this.state.clkColor[index];                        
             if(this.state.clkDrag[index]&&index){
                 this.state.myCanvas.moveTo(this.state.currentLine[index-1].x,this.state.currentLine[index-1].y);
                 serverScoket.emit('draw_lines',{
@@ -111,7 +112,6 @@ class SocialBoard extends Component{
             
             this.state.myCanvas.lineTo(this.state.currentLine[index].x,this.state.currentLine[index].y);
             this.state.myCanvas.closePath();
-            this.state.myCanvas.strokeStyle=this.state.clkColor[index];            
             this.state.myCanvas.stroke();
         });
     }
