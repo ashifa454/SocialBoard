@@ -26,7 +26,7 @@ class App extends Component {
                         <SocialBoard/>
                     </Grid.Column>
                     <Grid.Column width={4}>
-                        <memberContainer/>
+                        <MemberContainer/>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

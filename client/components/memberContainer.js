@@ -1,13 +1,13 @@
 import React,{Component} from 'react';
-import {List,Image} from 'semantic-ui-react';
+import {List,Image,Message} from 'semantic-ui-react';
 class MemberContainer extends Component{
     render(){
         return (
             <div>
     <Message
       attached
+      size={'small'}
       header='Active Members'
-      content='Start Drawing whatever you want'
     />
             <List attached>
             <List.Item>
