@@ -2,8 +2,8 @@ import React,{Component} from 'react';
 import {List,Image,Message,Form,Input,Loader,Icon,Segment,Feed} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {ActionCreater} from '../app/actions';
-import {dbRefMessage} from '../App/lib/firebaseApi';
+import {ActionCreater} from '../app/actions/index.js';
+import {dbRefMessage} from '../App/lib/firebaseApi.js';
 class MemberContainer extends Component{
     constructor(props){
         super(props);
