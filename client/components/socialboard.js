@@ -4,7 +4,7 @@ import openSocket from 'socket.io-client';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {ActionCreater} from '../App/actions/index.js';
-const serverScoket=openSocket('https://socialboard.herokuapp.com');
+const serverScoket=openSocket('http://localhost:5000');
 const colors=[
     'red', 'orange', 'yellow', 'olive', 'green', 'teal',
     'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black'
@@ -18,6 +18,7 @@ class SocialBoard extends Component{
             clkDrag:[],
             paint:false,
             clkColor:[],
+            OthUser:null,
             brushColor:'#212121',
             myCanvas:null
         }
@@ -39,16 +40,24 @@ class SocialBoard extends Component{
             myCanvas:this.refs.board.getContext("2d")},()=>{
                 this.state.myCanvas.lineJoin="round";
                 this.state.myCanvas.lineWidth=5;
+                this.state.myCanvas.font="14pt Arial";
+                this.state.myCanvas.textAlign = "end";
+                this.state.myCanvas.fillStyle = "#9E9E9E";
                 this.state.myCanvas.clearRect(0, 0,this.state.myCanvas.width, this.state.myCanvas.height); 
+                //this.state.myCanvas.strokeText("Stroke Text, 22px, veranda", 20, 50);                                
+                
             });
             serverScoket.on('draw_lines',(data)=>{
                 this.state.myCanvas.beginPath(); 
                 this.state.myCanvas.moveTo(data.previousLine[0],data.previousLine[1]);
                 this.state.myCanvas.lineTo(data.line[0], data.line[1]);
-                this.state.myCanvas.closePath();
-                this.state.myCanvas.strokeStyle=data.color;            
+                this.state.myCanvas.closePath();                
+                this.state.myCanvas.strokeStyle=data.color;                                            
                 this.state.myCanvas.stroke();
-        });
+            });
+            serverScoket.on('increase_line',(data)=>{
+                this.state.myCanvas.fillText(data.username, data.x,data.y);
+            })
     }
     _handleColorSelect(index){
         this.setState({
@@ -56,7 +65,6 @@ class SocialBoard extends Component{
         })
     }
     _handleMouseDown(event){
-        console.log(this.refs.board.getBoundingClientRect().left);
         if(this.props.members&&this.props.members.length>0){
             this.setState({
                 paint:true
@@ -70,22 +78,36 @@ class SocialBoard extends Component{
         }
     }
     _handleMouseMove(event){
+        var drawX=event.pageX-this.refs.board.getBoundingClientRect().left;
+        var drawY=event.pageY-this.refs.board.getBoundingClientRect().top;
         if(this.state.paint){
-            var drawX=event.pageX-this.refs.board.getBoundingClientRect().left;
-            var drawY=event.pageY-this.refs.board.getBoundingClientRect().top;
             this.addClickEvent(drawX,drawY,true);
             this.redrawBoard();
         }
     }
     _handleMouseUp(event){
+        var drawX=event.pageX-this.refs.board.getBoundingClientRect().left;
+        var drawY=event.pageY-this.refs.board.getBoundingClientRect().top;
+        if(this.props.members&&this.props.members.length>0){
         this.setState({
-            paint:false
+            paint:false,
+        },()=>{
+            serverScoket.emit('increase_line',{
+                x:drawX,
+                y:drawY,
+                username:this.props.members        
+            })
         })
         this.redrawBoard();
+        }
     }
     _handleMouseLeave(event){
         this.setState({
-            paint:false
+            paint:false,
+        },()=>{
+            serverScoket.emit('increase_line',{
+                
+            })
         })
     }
     redrawBoard(){
@@ -102,20 +124,21 @@ class SocialBoard extends Component{
                         this.state.currentLine[index-1].x,this.state.currentLine[index-1].y
                     ],
                     color:this.state.brushColor,
+                    username:this.props.members
                 })
             }else{
-                this.state.myCanvas.moveTo(this.state.currentLine[index].x,this.state.currentLine[index].y);
+                this.state.myCanvas.moveTo(this.state.currentLine[index].x-1,this.state.currentLine[index].y);
                 serverScoket.emit('draw_lines',{
                     line:[
                         this.state.currentLine[index].x,this.state.currentLine[index].y 
                     ],
                     previousLine:[
-                        this.state.currentLine[index].x,this.state.currentLine[index].y
+                        this.state.currentLine[index].x-1,this.state.currentLine[index].y
                     ],
                     color:this.state.brushColor,
+                    username:this.props.members
                 })
             }
-            console.log(this.state.currentLine[index])
             this.state.myCanvas.lineTo(this.state.currentLine[index].x,this.state.currentLine[index].y);
             this.state.myCanvas.closePath();
             this.state.myCanvas.stroke();
