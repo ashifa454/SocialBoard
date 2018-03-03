@@ -13,7 +13,7 @@ import WDM from './WDM'
 import http from 'http';
 import socket from 'socket.io';
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 5000;
 
 app.use(WDM);
 var server=http.createServer(app);
@@ -26,7 +26,7 @@ app.get('/',function(req, res, next){
     const store=createStore(reducer)
     let renderProps = {
         preloadState: `window.__PRELOADED_STATE__ =${JSON.stringify(preloadState).replace(/</g, '\\u003c')}`,
-        script: 'http://localhost:3000/build/client.bundle.js',
+        script: 'http://localhost:'+port+'/build/client.bundle.js',
         appComponent: ReactDOMServer.renderToString(<Provider store={store}><App data={preloadState}/></Provider>)
     };
 
@@ -56,5 +56,5 @@ io.on('connection',(socket)=>{
     });
 });
 server.listen(port, ()=>{
-    console.log('http://localhost:3000')
+    console.log('http://localhost:'+port)
 });
