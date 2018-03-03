@@ -39,6 +39,7 @@ class SocialBoard extends Component{
             myCanvas:this.refs.board.getContext("2d")},()=>{
                 this.state.myCanvas.lineJoin="round";
                 this.state.myCanvas.lineWidth=5;
+                this.state.myCanvas.clearRect(0, 0,this.state.myCanvas.width, this.state.myCanvas.height); 
             });
             serverScoket.on('draw_lines',(data)=>{
                 this.state.myCanvas.beginPath(); 
