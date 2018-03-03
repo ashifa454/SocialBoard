@@ -16,13 +16,13 @@ class MemberContainer extends Component{
         this._handleFormSubmit=this._handleFormSubmit.bind(this);
         this._handleInput=this._handleInput.bind(this);
         this._handleMessaeSubmit=this._handleMessaeSubmit.bind(this);
-        dbRefMessage.on('value',(snapshot)=>{
+        /*dbRefMessage.on('value',(snapshot)=>{
             this.setState({
-                message:Object.values(snapshot.val())
+                message:Object.keys(snapshot.val()).map((key)=>{return snapshot[key]})
             },()=>{
-                console.log(this.state.message);
+                console.log(typeof this.)
             });
-        })
+        })*/
     }
     _handleFormSubmit(e){
         this.props.setMember(this.state.username);
@@ -40,8 +40,9 @@ class MemberContainer extends Component{
     }
     componentDidMount(){
         dbRefMessage.on('value',(snapshot)=>{
+            console.log(Object.values(snapshot.val()));
             this.setState({
-                message:snapshot.val()
+                message:Object.values(snapshot.val())
             });
         })
     }
@@ -68,11 +69,10 @@ class MemberContainer extends Component{
       <Feed.Label icon='smile' />
       <Feed.Content>
         <Feed.Summary>
-        <Feed.User>Elliot Fu</Feed.User>
-          <Feed.Date>3 days ago</Feed.Date>
+        <Feed.User>{item.name}</Feed.User>
         </Feed.Summary>
         <Feed.Extra text>
-          I'm having a BBQ this weekend. Come by around 4pm if you can.
+          {item.message}
         </Feed.Extra>
       </Feed.Content>
     </Feed.Event>
