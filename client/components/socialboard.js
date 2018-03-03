@@ -1,6 +1,9 @@
 import React,{Component} from 'react';
 import {Button,Segment,Message,Header,Label,TransitionablePortal} from 'semantic-ui-react';
 import openSocket from 'socket.io-client';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {ActionCreater} from '../app/actions';
 const serverScoket=openSocket('http://localhost:3000');
 const colors=[
     'red', 'orange', 'yellow', 'olive', 'green', 'teal',
@@ -25,9 +28,9 @@ class SocialBoard extends Component{
         this._handleColorSelect=this._handleColorSelect.bind(this);
     }
     addClickEvent(x,y,drag){
-        this.state.currentLine.push({
-            x:x,y:y});
-        //this.state.clkY.push(y);
+        this.state.currentLine.push(
+            {x:x,y:y}
+        );
         this.state.clkDrag.push(drag)
         this.state.clkColor.push(this.state.brushColor)
     }
@@ -52,30 +55,32 @@ class SocialBoard extends Component{
         })
     }
     _handleMouseDown(event){
-        this.setState({
-            paint:true
-        })
-        var drawX=event.pageX-this.refs.board.offsetLeft;
-        var drawY=event.pageY-this.refs.board.offsetTop;
-        this.addClickEvent(drawX,drawY);
-        this.redrawBoard();
+        console.log(this.refs.board.getBoundingClientRect().left);
+        if(this.props.members&&this.props.members.length>0){
+            this.setState({
+                paint:true
+            })
+            var drawX=event.pageX-this.refs.board.getBoundingClientRect().left;
+            var drawY=event.pageY-this.refs.board.getBoundingClientRect().top;
+            this.addClickEvent(drawX,drawY,false);
+            this.redrawBoard();
+        }else{
+            alert("You Need To Enter your Name to Get Started");
+        }
     }
     _handleMouseMove(event){
         if(this.state.paint){
-            var drawX=event.pageX-this.refs.board.offsetLeft;
-            var drawY=event.pageY-this.refs.board.offsetTop;
+            var drawX=event.pageX-this.refs.board.getBoundingClientRect().left;
+            var drawY=event.pageY-this.refs.board.getBoundingClientRect().top;
             this.addClickEvent(drawX,drawY,true);
             this.redrawBoard();
-            this.state.previousLine.push({
-                x:drawX,
-                y:drawY
-            })
         }
     }
     _handleMouseUp(event){
         this.setState({
             paint:false
         })
+        this.redrawBoard();
     }
     _handleMouseLeave(event){
         this.setState({
@@ -98,18 +103,18 @@ class SocialBoard extends Component{
                     color:this.state.brushColor,
                 })
             }else{
-                this.state.myCanvas.moveTo(this.state.currentLine[index].x-1,this.state.currentLine[index].y);
+                this.state.myCanvas.moveTo(this.state.currentLine[index].x,this.state.currentLine[index].y);
                 serverScoket.emit('draw_lines',{
                     line:[
-                        this.state.currentLine[index].x,this.state.currentLine[index].y
+                        this.state.currentLine[index].x,this.state.currentLine[index].y 
                     ],
                     previousLine:[
-                        this.state.currentLine[index].x-1,this.state.currentLine[index].y
+                        this.state.currentLine[index].x,this.state.currentLine[index].y
                     ],
                     color:this.state.brushColor,
                 })
             }
-            
+            console.log(this.state.currentLine[index])
             this.state.myCanvas.lineTo(this.state.currentLine[index].x,this.state.currentLine[index].y);
             this.state.myCanvas.closePath();
             this.state.myCanvas.stroke();
@@ -133,7 +138,7 @@ class SocialBoard extends Component{
                     onMouseLeave={this._handleMouseLeave}
                     onMouseUp={this._handleMouseUp}
                     height={500} width={910} 
-                    style={{border:'1px dashed #212121',backgroundColor:'#FFFFFF'}}>
+                    style={{border:'1px dashed #212121',backgroundColor:'#FFFFFF',cursor:'pointer'}}>
             
             </canvas>        
     </Segment>
@@ -151,4 +156,12 @@ class SocialBoard extends Component{
         )
     }
 }
-export default SocialBoard;
+function mapStateToProps(state){
+    return {
+        members:state.NewMember
+    }
+}
+function mapDispatchToProps(dispatch){
+    return bindActionCreators(ActionCreater,dispatch);
+}
+export default connect(mapStateToProps,mapDispatchToProps)(SocialBoard);

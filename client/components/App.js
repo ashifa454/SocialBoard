@@ -7,16 +7,7 @@ class App extends Component {
 
     constructor(props){
         super(props);
-        this.state = {
-            text : this.props.data.text
-        }
-    }
-    componentDidMount(){
-        this._updateMyCanvas()
-    }
-    _updateMyCanvas(){
-        //const context=this.refs.myCanvas.getContext('2d');
-        //context.fillRect(0,0,100,100)
+        
     }
     render() {
         return (
