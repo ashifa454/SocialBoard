@@ -29,7 +29,6 @@
     "webpack-dev-middleware": "^1.11.0"
   },
   "scripts": {
-    "heroku-prebuild": "npm install --only=dev",
     "start":"nodemon --exec babel-node server",
     "dev": "nodemon --exec babel-node server",
     "build": "webpack"
