@@ -49,10 +49,10 @@ class SocialBoard extends Component{
             });
             serverScoket.on('draw_lines',(data)=>{
                 this.state.myCanvas.beginPath(); 
+                this.state.myCanvas.strokeStyle=data.color;
                 this.state.myCanvas.moveTo(data.previousLine[0],data.previousLine[1]);
                 this.state.myCanvas.lineTo(data.line[0], data.line[1]);
-                this.state.myCanvas.closePath();                
-                this.state.myCanvas.strokeStyle=data.color;                                            
+                this.state.myCanvas.closePath();                                                            
                 this.state.myCanvas.stroke();
             });
             serverScoket.on('increase_line',(data)=>{
@@ -123,7 +123,7 @@ class SocialBoard extends Component{
                     previousLine:[
                         this.state.currentLine[index-1].x,this.state.currentLine[index-1].y
                     ],
-                    color:this.state.brushColor,
+                    color:this.state.clkColor[index],
                     username:this.props.members
                 })
             }else{
@@ -135,7 +135,7 @@ class SocialBoard extends Component{
                     previousLine:[
                         this.state.currentLine[index].x-1,this.state.currentLine[index].y
                     ],
-                    color:this.state.brushColor,
+                    color:this.state.clkColor[index],
                     username:this.props.members
                 })
             }
