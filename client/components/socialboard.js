@@ -3,7 +3,7 @@ import {Button,Segment,Message,Header,Label,TransitionablePortal} from 'semantic
 import openSocket from 'socket.io-client';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {ActionCreater} from '../app/actions/index.js';
+import {ActionCreater} from '../App/actions/index.js';
 const serverScoket=openSocket('http://localhost:3000');
 const colors=[
     'red', 'orange', 'yellow', 'olive', 'green', 'teal',
