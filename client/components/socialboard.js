@@ -4,7 +4,7 @@ import openSocket from 'socket.io-client';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {ActionCreater} from '../App/actions/index.js';
-const serverScoket=openSocket('http://localhost:5000');
+const serverScoket=openSocket('https://socialboard.herokuapp.com/');
 const colors=[
     'red', 'orange', 'yellow', 'olive', 'green', 'teal',
     'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black'
