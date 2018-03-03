@@ -35,6 +35,9 @@ class MemberContainer extends Component{
             this.props.sendMessage({
                 name:this.state.username,
                 message:this.state.msgInput
+            })
+            this.setState({
+                msgInput:''
             })        
         }
     }
@@ -86,6 +89,7 @@ class MemberContainer extends Component{
     icon={<Icon name='send' inverted circular link onClick={this._handleMessaeSubmit}/>}
     placeholder='Type Your Message'
     name='msgInput'
+    value={this.state.msgInput}
     onChange={this._handleInput}
   /></div>:<Form onSubmit={this._handleFormSubmit}>
                 <Form.Input label='What`s Your Good Name' name="username" onChange={this._handleInput}/>
