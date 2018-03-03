@@ -26,7 +26,7 @@ app.get('/',function(req, res, next){
     const store=createStore(reducer)
     let renderProps = {
         preloadState: `window.__PRELOADED_STATE__ =${JSON.stringify(preloadState).replace(/</g, '\\u003c')}`,
-        script: 'http://localhost:'+port+'/build/client.bundle.js',
+        script: 'https://socialboard.herokuapp.com/build/client.bundle.js',
         appComponent: ReactDOMServer.renderToString(<Provider store={store}><App data={preloadState}/></Provider>)
     };
 
